@@ -17,7 +17,7 @@ const Home = () => {
       <Helmet>
         <title>Home</title>
       </Helmet>
-      <div className="min-h-screen w-screen bg-slate-900 text-white font-sans">
+      <div className="min-h-screen bg-slate-900 text-white font-sans">
         <Nav />
         <div className="flex flex-col w-full max-w-4xl mx-auto p-4">
           <div className="py-4">
