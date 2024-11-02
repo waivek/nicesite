@@ -315,10 +315,10 @@ const Reactions = () => {
               <div 
                 key={index} 
                 onClick={() => window.open(reaction.url, '_blank', 'noopener,noreferrer')}
-                className="w-full border-2 border-slate-700 rounded-lg hover:bg-slate-900 hover:border-white overflow-clip
-                transition-colors cursor-pointer shadow-lg hover:shadow-xl bg-slate-800/50"
+                className="group w-full border-2 border-slate-700 rounded-lg hover:bg-slate-900 hover:border-teal-400 overflow-clip
+                cursor-pointer shadow-lg hover:shadow-xl bg-slate-800/50"
               >
-                <div className="text-xs leading-tight flex items-center gap-2 ">
+                <div className="group-hover:bg-teal-400 group-hover:text-black text-xs leading-tight flex items-center gap-2 ">
                   <span className={`pl-4 pr-2 py-1 rounded-tl font-medium ${
                     reaction.date?.isValid && isWithinTimeWindow(reaction.date)
                       ? 'bg-green-900/50 text-green-400' 
@@ -326,7 +326,7 @@ const Reactions = () => {
                   }`}>
                     {reaction.date?.isValid ? reaction.date.toRelative() : ''}
                   </span>
-                  <span className="text-slate-400 flex-1">
+                  <span className="text-slate-400 group-hover:text-black flex-1">
                     {reaction.date.isValid ? 
                       reaction.date.toFormat("MMM d, ccc h:mma ZZZ") : 
                       `ERROR: ${reaction.date.invalidReason} - ${reaction.date.invalidExplanation}`
@@ -334,17 +334,17 @@ const Reactions = () => {
                   </span>
                   <span 
                     onClick={e => handleDelete(index, e)}
-                    className="transition-colors text-white rounded-tr px-2 py-1 cursor-pointer hover:bg-red-900 hover:text-red-500 tracking-widest uppercase"
+                    className="group-hover:text-black text-white rounded-tr px-2 py-1 cursor-pointer hover:bg-red-900 group-hover:hover:text-red-500 tracking-widest uppercase"
                   >
                     delete
                   </span>
                 </div>
                 
                 <div className="border-t border-inherit"></div>
-                <div className="flex justify-between items-center p-4">
-                  <div className="text-xl text-slate-100 flex items-center gap-2">
+                <div className="flex justify-between items-center p-4 group-hover:bg-teal-300">
+                  <div className="text-xl text-slate-100 group-hover:text-black flex items-center gap-2">
                     <span className="font-bold uppercase tracking-widest">{reaction.type}</span>
-                    <span className="text-md text-slate-500">{reaction.name}</span>
+                    <span className="text-md text-slate-500 group-hover:text-teal-900">{reaction.name}</span>
                   </div>
                 </div>
               </div>
