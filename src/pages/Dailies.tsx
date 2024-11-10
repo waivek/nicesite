@@ -222,11 +222,64 @@ const PRESET_TODOS: TodoItem[] = [
   },
 ];
 
+interface TimeZoneOption {
+  value: string;     // IANA timezone
+  label: string;     // Abbreviation
+  display?: string;  // Optional full name
+}
+
+const COMMON_TIMEZONES: TimeZoneOption[] = [
+  // US Timezones
+  { value: 'America/Los_Angeles', label: 'PDT', display: 'Pacific Time' },
+  { value: 'America/New_York', label: 'EDT', display: 'Eastern Time' },
+  
+  // Asia Pacific
+  { value: 'Asia/Manila', label: 'PHT', display: 'Philippines Time' },
+  { value: 'Asia/Kuala_Lumpur', label: 'MYT', display: 'Malaysia Time' },
+  { value: 'Asia/Shanghai', label: 'CST', display: 'China Standard Time' },
+  { value: 'Asia/Tokyo', label: 'JST', display: 'Japan Standard Time' },
+  { value: 'Asia/Seoul', label: 'KST', display: 'Korea Standard Time' },
+  
+  // Other major timezones
+  { value: 'Asia/Kolkata', label: 'IST', display: 'India Standard Time' },
+  { value: 'Europe/London', label: 'BST', display: 'British Time' },
+  { value: 'Europe/Paris', label: 'CEST', display: 'Central European Time' },
+  { value: 'Australia/Sydney', label: 'AEST', display: 'Australian Eastern Time' },
+  { value: 'Pacific/Auckland', label: 'NZST', display: 'New Zealand Time' },
+];
+
 const Dailies = () => {
-  const [currentTime, setCurrentTime] = useState({
-    ist: DateTime.now().setZone('Asia/Kolkata'),
+  const [selectedTimezone, setSelectedTimezone] = useState<string>(() => 
+    localStorage.getItem('userTimezone') || ''
+  );
+
+  const [currentTime, setCurrentTime] = useState(() => ({
+    local: selectedTimezone 
+      ? DateTime.now().setZone(selectedTimezone)
+      : null,
     kst: DateTime.now().setZone('Asia/Seoul')
-  });
+  }));
+
+  useEffect(() => {
+    localStorage.setItem('userTimezone', selectedTimezone);
+    setCurrentTime(current => ({
+      ...current,
+      local: DateTime.now().setZone(selectedTimezone)
+    }));
+  }, [selectedTimezone]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime({
+        local: selectedTimezone 
+          ? DateTime.now().setZone(selectedTimezone)
+          : null,
+        kst: DateTime.now().setZone('Asia/Seoul')
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [selectedTimezone]);
 
   const [todos, setTodos] = useState<TodoItem[]>(() => {
     const savedTodos = localStorage.getItem('dailyTodos');
@@ -260,18 +313,6 @@ const Dailies = () => {
     const saved = localStorage.getItem('dailyCollapsedCategories');
     return saved ? JSON.parse(saved) : [];
   });
-
-  // Simple timer just for display
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime({
-        ist: DateTime.now().setZone('Asia/Kolkata'),
-        kst: DateTime.now().setZone('Asia/Seoul')
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     localStorage.setItem('dailyTodos', JSON.stringify({
@@ -563,16 +604,34 @@ const Dailies = () => {
       <div className="min-h-screen bg-slate-900 text-white font-sans">
         <Nav />
         <div className="flex flex-col w-full max-w-4xl mx-auto p-4">
-          <div className="flex gap-4 items-center py-4 ">
-            <h1 className="text-4xl font-semibold tracking-wide">Dailies</h1>
-            <div className="flex gap-4 ml-auto text-sm">
-              <div>
-                <span className="text-slate-400">IST:</span>
-                <span className="ml-2 font-mono text-cyan-400">
-                  {currentTime.ist.toFormat('HH:mm:ss')}
-                </span>
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center py-4">
+            <h1 className="text-3xl sm:text-4xl font-semibold tracking-wide">Dailies</h1>
+            
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full sm:w-auto sm:ml-auto text-sm">
+              <div className="flex items-center gap-2">
+                <select
+                  value={selectedTimezone}
+                  onChange={(e) => setSelectedTimezone(e.target.value)}
+                  className="w-full sm:w-auto bg-slate-700 border border-slate-600 rounded px-2 py-1 text-sm focus:ring-amber-500 focus:border-amber-500"
+                >
+                  <option value="">Select timezone...</option>
+                  {COMMON_TIMEZONES.map(tz => (
+                    <option key={tz.value} value={tz.value}>
+                      {tz.label} - {tz.display || tz.value}
+                    </option>
+                  ))}
+                </select>
+                {selectedTimezone ? (
+                  <span className="font-mono text-cyan-400 whitespace-nowrap">
+                    {currentTime.local?.toFormat('HH:mm:ss')}
+                  </span>
+                ) : (
+                  <span className="text-slate-400 italic">
+                    Please select a timezone
+                  </span>
+                )}
               </div>
-              <div>
+              <div className="whitespace-nowrap">
                 <span className="text-slate-400">KST:</span>
                 <span className="ml-2 font-mono text-cyan-400">
                   {currentTime.kst.toFormat('HH:mm:ss')}
