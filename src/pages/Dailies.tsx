@@ -148,25 +148,7 @@ const getTownSquareStatus = (kstTime: DateTime) => {
 const PRESET_TODOS: TodoItem[] = [
   // Advertisement category
   { id: 'preset-5', text: 'Tree of Wishes', completed: false, preset: true },
-  { id: 'preset-1', text: 'Letter Ads x 5', completed: false, preset: true, category: 'Advertisements' },
-  { id: 'preset-2', text: 'Time Skip Ads x 5', completed: false, preset: true, category: 'Advertisements' },
-  { id: 'preset-3', text: 'Free Gift Ads x 1', completed: false, preset: true, category: 'Advertisements' },
-  // Alliance
-    { 
-    id: 'preset-6', 
-    text: 'Bounties', 
-    completed: false, 
-    preset: true,
-    icon: '/assets/dailies/bounties.png'
-  },
-  { 
-    id: 'preset-7', 
-    text: 'Trade Ships x 2', 
-    completed: false, 
-    preset: true,
-    icon: '/assets/dailies/touc.png'
-  },
-{
+  {
     id: 'preset-11',
     text: 'Daily Gifts',
     completed: false,
@@ -187,6 +169,25 @@ const PRESET_TODOS: TodoItem[] = [
     preset: true,
     category: 'Quick Tasks'
   },
+  { id: 'preset-1', text: 'Letter Ads x 5', completed: false, preset: true, category: 'Advertisements' },
+  { id: 'preset-2', text: 'Time Skip Ads x 5', completed: false, preset: true, category: 'Advertisements' },
+  { id: 'preset-3', text: 'Free Gift Ads x 1', completed: false, preset: true, category: 'Advertisements' },
+  // Alliance
+    { 
+    id: 'preset-6', 
+    text: 'Bounties', 
+    completed: false, 
+    preset: true,
+    icon: '/assets/dailies/bounties.png'
+  },
+  { 
+    id: 'preset-7', 
+    text: 'Trade Ships x 2', 
+    completed: false, 
+    preset: true,
+    icon: '/assets/dailies/touc.png'
+  },
+
   
   // Cuckoo Town Square category
   { 
@@ -229,12 +230,24 @@ const Dailies = () => {
 
   const [todos, setTodos] = useState<TodoItem[]>(() => {
     const savedTodos = localStorage.getItem('dailyTodos');
-    const savedData = savedTodos ? JSON.parse(savedTodos) : { custom: [], presetStates: {} };
+    const savedData = savedTodos ? JSON.parse(savedTodos) : { custom: [], presetStates: {}, lastResetDate: '' };
     
-    // Get completed states for presets
+    // Get the current KST date
+    const currentKstDate = DateTime.now().setZone('Asia/Seoul').startOf('day');
+    const lastResetDate = savedData.lastResetDate 
+      ? DateTime.fromISO(savedData.lastResetDate).setZone('Asia/Seoul').startOf('day')
+      : currentKstDate;
+
+    // If the saved data is from a previous day, reset all completed states
+    if (!currentKstDate.equals(lastResetDate)) {
+      return PRESET_TODOS.map(preset => ({
+        ...preset,
+        completed: false
+      }));
+    }
+    
+    // Otherwise, load saved states
     const presetStates = savedData.presetStates || {};
-    
-    // Apply saved states to presets
     const presetsWithState = PRESET_TODOS.map(preset => ({
       ...preset,
       completed: presetStates[preset.id] || false
@@ -242,13 +255,13 @@ const Dailies = () => {
     
     return [...presetsWithState, ...(savedData.custom || [])];
   });
-//   const [newTodo, setNewTodo] = useState('');
+
   const [collapsedCategories, setCollapsedCategories] = useState<string[]>(() => {
-    // Initialize from localStorage
     const saved = localStorage.getItem('dailyCollapsedCategories');
     return saved ? JSON.parse(saved) : [];
   });
 
+  // Simple timer just for display
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime({
@@ -261,32 +274,21 @@ const Dailies = () => {
   }, []);
 
   useEffect(() => {
-    // Save both custom todos and preset states
-    const customTodos = todos.filter(todo => !todo.preset);
-    const presetStates = todos
-      .filter(todo => todo.preset)
-      .reduce((acc, todo) => ({
-        ...acc,
-        [todo.id]: todo.completed
-      }), {});
-
     localStorage.setItem('dailyTodos', JSON.stringify({
-      custom: customTodos,
-      presetStates: presetStates
+      custom: todos.filter(todo => !todo.preset),
+      presetStates: todos
+        .filter(todo => todo.preset)
+        .reduce((acc, todo) => ({
+          ...acc,
+          [todo.id]: todo.completed
+        }), {}),
+      lastResetDate: DateTime.now().setZone('Asia/Seoul').startOf('day').toISO()
     }));
   }, [todos]);
 
   useEffect(() => {
     localStorage.setItem('dailyCollapsedCategories', JSON.stringify(collapsedCategories));
   }, [collapsedCategories]);
-
-//   const addTodo = (e: React.FormEvent) => {
-//     e.preventDefault();
-//     if (newTodo.trim()) {
-//       setTodos([...todos, { id: crypto.randomUUID(), text: newTodo.trim(), completed: false }]);
-//       setNewTodo('');
-//     }
-//   };
 
   const toggleTodo = (id: string) => {
     setTodos(todos.map(todo =>

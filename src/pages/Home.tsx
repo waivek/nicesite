@@ -11,7 +11,7 @@ const routes = [
   {
     path: '/dailies',
     name: 'Dailies',
-    description: 'Track your daily tasks and habits'
+    description: 'Daily CRK Tasks'
   }
   // Add more routes here as needed
 ];
