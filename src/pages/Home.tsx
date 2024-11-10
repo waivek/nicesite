@@ -8,6 +8,11 @@ const routes = [
     name: 'Reactions',
     description: 'Manage and track your recurring reactions'
   },
+  {
+    path: '/dailies',
+    name: 'Dailies',
+    description: 'Track your daily tasks and habits'
+  }
   // Add more routes here as needed
 ];
 

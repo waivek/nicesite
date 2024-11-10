@@ -318,10 +318,10 @@ const Reactions = () => {
                 className="group w-full border-2 border-slate-700 rounded-lg hover:bg-slate-900 hover:border-teal-400 overflow-clip
                 cursor-pointer shadow-lg hover:shadow-xl bg-slate-800/50"
               >
-                <div className="group-hover:bg-teal-400 group-hover:text-black text-xs leading-tight flex items-center gap-2 ">
+                <div className="group-hover:bg-teal-400 group-hover:text-black text-xs leading-tight flex items-center gap-2">
                   <span className={`pl-4 pr-2 py-1 rounded-tl font-medium ${
                     reaction.date?.isValid && isWithinTimeWindow(reaction.date)
-                      ? 'bg-green-900/50 text-green-400' 
+                      ? 'm-1 bg-green-900/50 border-2 border-transparent text-green-400 group-hover:bg-green-400 group-hover:text-black group-hover:border-green-600' 
                       : ''
                   }`}>
                     {reaction.date?.isValid ? reaction.date.toRelative() : ''}
