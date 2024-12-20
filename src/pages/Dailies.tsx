@@ -167,7 +167,8 @@ const PRESET_TODOS: TodoItem[] = [
     text: 'Guild Check-In',
     completed: false,
     preset: true,
-    category: 'Quick Tasks'
+    category: 'Quick Tasks',
+    icon: '/assets/dailies/checkin.png'
   },
   { id: 'preset-1', text: 'Letter Ads x 5', completed: false, preset: true, category: 'Advertisements' },
   { id: 'preset-2', text: 'Time Skip Ads x 5', completed: false, preset: true, category: 'Advertisements' },
